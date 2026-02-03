@@ -8,24 +8,29 @@ let package = Package(
     platforms: [
         .iOS(.v16),
         .macOS(.v13),
-        .tvOS(.v16),
-        .watchOS(.v9)
+        .watchOS(.v9),
+        .tvOS(.v16)
     ],
     products: [
         .library(
             name: "SwiftUIChartsPro",
             targets: ["SwiftUIChartsPro"]
-        )
+        ),
     ],
     targets: [
         .target(
             name: "SwiftUIChartsPro",
-            path: "Sources/SwiftUIChartsPro"
+            dependencies: [],
+            path: "Sources/SwiftUIChartsPro",
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]
         ),
         .testTarget(
             name: "SwiftUIChartsProTests",
             dependencies: ["SwiftUIChartsPro"],
             path: "Tests/SwiftUIChartsProTests"
-        )
-    ]
+        ),
+    ],
+    swiftLanguageVersions: [.v5]
 )
