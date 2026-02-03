@@ -5,39 +5,39 @@ disabled_rules:
   - file_length
   - function_body_length
   - cyclomatic_complexity
-  - type_name
-  - identifier_name
-  - force_cast
   - nesting
 
 opt_in_rules:
   - empty_count
   - closure_spacing
-  - contains_over_first_not_nil
-  - discouraged_object_literal
-  - empty_string
-  - explicit_init
-  - fatal_error_message
   - first_where
-  - joined_default_parameter
+  - implicit_return
   - modifier_order
   - operator_usage_whitespace
-  - overridden_super_call
-  - private_action
-  - private_outlet
-  - redundant_nil_coalescing
   - sorted_first_last
   - toggle_bool
-  - unneeded_parentheses_in_closure_argument
-  - vertical_parameter_alignment_on_call
   - yoda_condition
+
+included:
+  - Sources
+  - Tests
 
 excluded:
   - .build
+  - Packages
   - DerivedData
-  - Pods
-  - Carthage
-  - Package.swift
-  - Tests
 
-reporter: "xcode"
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  excluded:
+    - id
+    - x
+    - y
+    - z
+    - i
+    - j
+    - r
+    - g
+    - b

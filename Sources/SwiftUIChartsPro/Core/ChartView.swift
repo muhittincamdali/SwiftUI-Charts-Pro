@@ -1,139 +1,108 @@
 import SwiftUI
 
-// MARK: - Chart Protocol
-
-/// Base protocol for all chart views
-public protocol ChartViewProtocol: View {
+/// A protocol that defines the common interface for all chart views.
+///
+/// Conform to `ChartViewStyle` to create custom chart types that integrate
+/// with the tooltip and export systems.
+///
+/// ```swift
+/// struct MyChart: ChartViewStyle {
+///     typealias DataType = [Double]
+///     func makeBody(data: [Double], configuration: ChartConfiguration) -> some View { ... }
+/// }
+/// ```
+public protocol ChartViewStyle {
     associatedtype DataType
-    var data: DataType { get }
-    var theme: ChartTheme { get }
+    associatedtype Body: View
+
+    /// Creates the chart body from data and configuration.
+    @ViewBuilder
+    func makeBody(data: DataType, configuration: ChartConfiguration) -> Body
 }
 
-// MARK: - Chart Selection Handler
+/// Configuration options shared across all chart types.
+public struct ChartConfiguration {
 
-/// Closure type for handling chart element selection
-public typealias ChartSelectionHandler = (Int, Double) -> Void
+    /// Whether to animate data changes.
+    public var animated: Bool
 
-// MARK: - Chart Modifier Keys
+    /// The duration of data change animations.
+    public var animationDuration: Double
 
-private struct ChartThemeKey: EnvironmentKey {
-    static let defaultValue: ChartTheme = .default
-}
+    /// Whether to show grid lines behind the chart.
+    public var showGrid: Bool
 
-private struct ChartTooltipKey: EnvironmentKey {
-    static let defaultValue: AnyView? = nil
-}
+    /// The color of grid lines.
+    public var gridColor: Color
 
-extension EnvironmentValues {
-    public var chartTheme: ChartTheme {
-        get { self[ChartThemeKey.self] }
-        set { self[ChartThemeKey.self] = newValue }
-    }
+    /// The font used for axis labels.
+    public var labelFont: Font
 
-    var chartTooltipView: AnyView? {
-        get { self[ChartTooltipKey.self] }
-        set { self[ChartTooltipKey.self] = newValue }
-    }
-}
+    /// The color of axis labels.
+    public var labelColor: Color
 
-// MARK: - Chart View Modifiers
+    /// Padding around the chart content area.
+    public var contentPadding: EdgeInsets
 
-public extension View {
-    /// Apply a chart theme to the chart
-    func chartTheme(_ theme: ChartTheme) -> some View {
-        environment(\.chartTheme, theme)
-    }
+    /// Whether tooltips are enabled.
+    public var tooltipsEnabled: Bool
 
-    /// Add a tooltip builder to the chart
-    func chartTooltip<Content: View>(
-        @ViewBuilder content: @escaping (Double, String) -> Content
-    ) -> some View {
-        environment(\.chartTooltipView, AnyView(content(0, "")))
-    }
-
-    /// Handle chart element selection
-    func onChartSelection(_ handler: @escaping ChartSelectionHandler) -> some View {
-        self.onPreferenceChange(ChartSelectionPreference.self) { selection in
-            if let selection = selection {
-                handler(selection.index, selection.value)
-            }
-        }
-    }
-}
-
-// MARK: - Selection Preference
-
-struct ChartSelection: Equatable {
-    let index: Int
-    let value: Double
-}
-
-struct ChartSelectionPreference: PreferenceKey {
-    static let defaultValue: ChartSelection? = nil
-    static func reduce(value: inout ChartSelection?, nextValue: () -> ChartSelection?) {
-        value = nextValue() ?? value
-    }
-}
-
-// MARK: - Axis Configuration
-
-/// Configuration for chart axes
-public struct AxisConfiguration {
-    public let showGrid: Bool
-    public let showLabels: Bool
-    public let labelCount: Int
-    public let gridLineStyle: StrokeStyle
-    public let labelFont: Font
-    public let labelColor: Color
-
+    /// Creates a chart configuration with default values.
     public init(
+        animated: Bool = true,
+        animationDuration: Double = 0.3,
         showGrid: Bool = true,
-        showLabels: Bool = true,
-        labelCount: Int = 5,
-        gridLineStyle: StrokeStyle = StrokeStyle(lineWidth: 0.5, dash: [4, 4]),
-        labelFont: Font = .caption2,
-        labelColor: Color = .secondary
+        gridColor: Color = .gray.opacity(0.2),
+        labelFont: Font = .caption,
+        labelColor: Color = .secondary,
+        contentPadding: EdgeInsets = EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8),
+        tooltipsEnabled: Bool = true
     ) {
+        self.animated = animated
+        self.animationDuration = animationDuration
         self.showGrid = showGrid
-        self.showLabels = showLabels
-        self.labelCount = labelCount
-        self.gridLineStyle = gridLineStyle
+        self.gridColor = gridColor
         self.labelFont = labelFont
         self.labelColor = labelColor
+        self.contentPadding = contentPadding
+        self.tooltipsEnabled = tooltipsEnabled
     }
-
-    public static let `default` = AxisConfiguration()
-    public static let hidden = AxisConfiguration(showGrid: false, showLabels: false)
 }
 
-// MARK: - Chart Legend
+/// A data point used across chart tooltips and interactions.
+public struct ChartDataPoint: Identifiable {
+    public let id = UUID()
 
-/// A reusable chart legend component
-public struct ChartLegend: View {
-    public let items: [(label: String, color: Color)]
-    public let orientation: Axis
+    /// The label for this data point.
+    public let label: String
 
-    public init(items: [(label: String, color: Color)], orientation: Axis = .horizontal) {
-        self.items = items
-        self.orientation = orientation
+    /// The numeric value.
+    public let value: Double
+
+    /// An optional color associated with this point.
+    public let color: Color?
+
+    /// The position of this point within the chart coordinate space.
+    public var position: CGPoint
+
+    /// Creates a chart data point.
+    public init(label: String, value: Double, color: Color? = nil, position: CGPoint = .zero) {
+        self.label = label
+        self.value = value
+        self.color = color
+        self.position = position
     }
+}
 
-    public var body: some View {
-        let layout = orientation == .horizontal
-            ? AnyLayout(HStackLayout(spacing: 16))
-            : AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+/// An environment key for passing chart configuration down the view hierarchy.
+struct ChartConfigurationKey: EnvironmentKey {
+    static let defaultValue = ChartConfiguration()
+}
 
-        layout {
-            ForEach(0..<items.count, id: \.self) { index in
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(items[index].color)
-                        .frame(width: 8, height: 8)
-                    Text(items[index].label)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
+public extension EnvironmentValues {
+    /// The current chart configuration.
+    var chartConfiguration: ChartConfiguration {
+        get { self[ChartConfigurationKey.self] }
+        set { self[ChartConfigurationKey.self] = newValue }
     }
 }
