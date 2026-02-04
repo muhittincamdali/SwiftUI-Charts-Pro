@@ -1,48 +1,83 @@
-<div align="center">
+<p align="center">
+  <img src="Assets/logo.png" alt="SwiftUI Charts Pro" width="200"/>
+</p>
 
-# 📊 SwiftUI-Charts-Pro
+<h1 align="center">SwiftUI Charts Pro</h1>
 
-**20+ advanced chart types for SwiftUI beyond Apple Charts**
+<p align="center">
+  <strong>📊 20+ advanced chart types for SwiftUI beyond Apple Charts</strong>
+</p>
 
-[![Swift](https://img.shields.io/badge/Swift-5.9+-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
-[![iOS](https://img.shields.io/badge/iOS-16.0+-000000?style=for-the-badge&logo=apple&logoColor=white)](https://developer.apple.com/ios/)
-[![SPM](https://img.shields.io/badge/SPM-Compatible-FA7343?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org/package-manager/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-
-</div>
-
----
-
-## ✨ Features
-
-- 📊 **20+ Chart Types** — Radar, treemap, sankey, heatmap
-- 🎯 **Interactive** — Tap, drag, zoom gestures
-- 📱 **Responsive** — Adapts to any screen
-- 🎨 **Themeable** — Full color customization
-- ⚡ **Animated** — Smooth transitions
+<p align="center">
+  <img src="https://img.shields.io/badge/Swift-6.0-orange.svg" alt="Swift"/>
+  <img src="https://img.shields.io/badge/iOS-17.0+-blue.svg" alt="iOS"/>
+</p>
 
 ---
 
-## 🚀 Quick Start
+## Chart Types
+
+| Category | Charts |
+|----------|--------|
+| **Basic** | Line, Bar, Pie, Donut |
+| **Advanced** | Radar, Sankey, Treemap, Sunburst |
+| **Financial** | Candlestick, OHLC, Waterfall |
+| **Statistical** | Box Plot, Violin, Histogram |
+| **Geographic** | Choropleth, Bubble Map |
+
+## Quick Start
 
 ```swift
 import SwiftUIChartsPro
 
 // Radar Chart
-RadarChart(data: skills, categories: ["Swift", "UI", "Backend"])
-
-// Heatmap
-HeatmapChart(data: activityData)
+RadarChart(data: skills) { item in
+    RadarMark(
+        axis: item.name,
+        value: item.level
+    )
+}
 
 // Treemap
-TreemapChart(data: marketData)
+TreemapChart(data: categories) { item in
+    TreemapMark(value: item.size)
+        .foregroundStyle(by: .value("Category", item.name))
+}
 
-// Sankey
-SankeyChart(nodes: nodes, links: links)
+// Candlestick
+CandlestickChart(data: stocks) { item in
+    CandlestickMark(
+        date: item.date,
+        open: item.open,
+        high: item.high,
+        low: item.low,
+        close: item.close
+    )
+}
 ```
 
----
+## Animations
 
-## 📄 License
+```swift
+RadarChart(data: data)
+    .animation(.spring(), value: data)
+    .chartAnimation(.interpolate)
+```
 
-MIT • [@muhittincamdali](https://github.com/muhittincamdali)
+## Interactivity
+
+```swift
+LineChart(data: values)
+    .chartOverlay { proxy in
+        // Tooltip on hover
+    }
+    .chartSelection($selection)
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+MIT License
