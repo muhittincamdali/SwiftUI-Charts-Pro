@@ -6,10 +6,11 @@ import PackageDescription
 let package = Package(
     name: "SwiftUIChartsPro",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v13),
-        .watchOS(.v9),
-        .tvOS(.v16)
+        .iOS(.v15),          // iOS 15+ backward compatibility (Apple Charts requires iOS 16+)
+        .macOS(.v12),        // macOS 12+ support
+        .watchOS(.v8),       // watchOS 8+ support
+        .tvOS(.v15),         // tvOS 15+ support
+        .visionOS(.v1)       // visionOS support
     ],
     products: [
         .library(

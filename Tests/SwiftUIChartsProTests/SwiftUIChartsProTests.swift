@@ -3,334 +3,369 @@ import XCTest
 
 final class SwiftUIChartsProTests: XCTestCase {
     
-    // MARK: - ChartDataSet Tests
+    // MARK: - Line Chart Tests
     
-    func testChartDataSetCreation() {
-        let dataSet = ChartDataSet(name: "Revenue", values: [100.0, 200.0, 150.0, 300.0])
+    func testLineDataSeriesCreation() {
+        let series = LineDataSeries(
+            name: "Test",
+            values: [1, 2, 3, 4, 5],
+            color: .blue
+        )
         
-        XCTAssertEqual(dataSet.name, "Revenue")
-        XCTAssertEqual(dataSet.count, 4)
-        XCTAssertFalse(dataSet.isEmpty)
+        XCTAssertEqual(series.name, "Test")
+        XCTAssertEqual(series.values.count, 5)
+        XCTAssertEqual(series.values[0], 1)
+        XCTAssertEqual(series.values[4], 5)
     }
     
-    func testChartDataSetStatistics() {
-        let dataSet = ChartDataSet(name: "Test", values: [10.0, 20.0, 30.0, 40.0, 50.0])
+    func testLineDataSeriesWithGradient() {
+        let series = LineDataSeries(
+            name: "Gradient",
+            values: [10, 20, 30],
+            gradient: LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+        )
         
-        XCTAssertEqual(dataSet.minimum, 10.0)
-        XCTAssertEqual(dataSet.maximum, 50.0)
-        XCTAssertEqual(dataSet.sum, 150.0)
-        XCTAssertEqual(dataSet.average, 30.0)
-        XCTAssertEqual(dataSet.range, 40.0)
+        XCTAssertNotNil(series.gradient)
     }
     
-    func testChartDataSetNormalization() {
-        let dataSet = ChartDataSet(name: "Test", values: [0.0, 50.0, 100.0])
-        let normalized = dataSet.normalized
+    // MARK: - Bar Chart Tests
+    
+    func testBarDataSeriesCreation() {
+        let series = BarDataSeries(
+            name: "Sales",
+            values: [100, 150, 200],
+            color: .green
+        )
         
-        XCTAssertEqual(normalized.count, 3)
-        XCTAssertEqual(normalized[0], 0.0, accuracy: 0.001)
-        XCTAssertEqual(normalized[1], 0.5, accuracy: 0.001)
-        XCTAssertEqual(normalized[2], 1.0, accuracy: 0.001)
+        XCTAssertEqual(series.name, "Sales")
+        XCTAssertEqual(series.values.count, 3)
     }
     
-    // MARK: - ChartMath Tests
+    // MARK: - Pie Chart Tests
     
-    func testMean() {
-        let values = [10.0, 20.0, 30.0, 40.0, 50.0]
-        XCTAssertEqual(ChartMath.mean(values), 30.0)
-    }
-    
-    func testMedian() {
-        let oddValues = [10.0, 20.0, 30.0, 40.0, 50.0]
-        XCTAssertEqual(ChartMath.median(oddValues), 30.0)
+    func testPieSliceCreation() {
+        let slice = PieSlice(
+            label: "iOS",
+            value: 60,
+            color: .blue
+        )
         
-        let evenValues = [10.0, 20.0, 30.0, 40.0]
-        XCTAssertEqual(ChartMath.median(evenValues), 25.0)
+        XCTAssertEqual(slice.label, "iOS")
+        XCTAssertEqual(slice.value, 60)
     }
     
-    func testVariance() {
-        let values = [2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0]
-        let variance = ChartMath.variance(values)
-        XCTAssertEqual(variance, 4.571, accuracy: 0.01)
-    }
-    
-    func testStandardDeviation() {
-        let values = [2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0]
-        let std = ChartMath.standardDeviation(values)
-        XCTAssertEqual(std, 2.138, accuracy: 0.01)
-    }
-    
-    func testPercentile() {
-        let values = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+    func testPieChartTotalCalculation() {
+        let slices = [
+            PieSlice(label: "A", value: 30),
+            PieSlice(label: "B", value: 40),
+            PieSlice(label: "C", value: 30)
+        ]
         
-        XCTAssertEqual(ChartMath.percentile(values, p: 0), 1.0, accuracy: 0.01)
-        XCTAssertEqual(ChartMath.percentile(values, p: 50), 5.5, accuracy: 0.01)
-        XCTAssertEqual(ChartMath.percentile(values, p: 100), 10.0, accuracy: 0.01)
+        let total = slices.reduce(0) { $0 + $1.value }
+        XCTAssertEqual(total, 100)
     }
     
-    func testQuartiles() {
-        let values = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
-        let quartiles = ChartMath.quartiles(values)
+    // MARK: - Area Chart Tests
+    
+    func testAreaDataSeriesCreation() {
+        let series = AreaDataSeries(
+            name: "Traffic",
+            values: [50, 60, 70, 80, 90],
+            color: .orange
+        )
         
-        XCTAssertEqual(quartiles.q1, 3.25, accuracy: 0.1)
-        XCTAssertEqual(quartiles.q2, 5.5, accuracy: 0.1)
-        XCTAssertEqual(quartiles.q3, 7.75, accuracy: 0.1)
+        XCTAssertEqual(series.name, "Traffic")
+        XCTAssertEqual(series.values.count, 5)
     }
     
-    func testCorrelation() {
-        let x = [1.0, 2.0, 3.0, 4.0, 5.0]
-        let y = [2.0, 4.0, 6.0, 8.0, 10.0]
+    // MARK: - Scatter Plot Tests
+    
+    func testScatterDataSeriesCreation() {
+        let points = [(x: 1.0, y: 2.0), (x: 3.0, y: 4.0), (x: 5.0, y: 6.0)]
+        let series = ScatterDataSeries(
+            name: "Correlation",
+            points: points,
+            color: .purple
+        )
         
-        let correlation = ChartMath.correlation(x, y)
-        XCTAssertEqual(correlation, 1.0, accuracy: 0.001)
+        XCTAssertEqual(series.name, "Correlation")
+        XCTAssertEqual(series.points.count, 3)
+        XCTAssertEqual(series.points[0].x, 1.0)
+        XCTAssertEqual(series.points[0].y, 2.0)
     }
     
-    func testLinearRegression() {
-        let x = [1.0, 2.0, 3.0, 4.0, 5.0]
-        let y = [2.0, 4.0, 6.0, 8.0, 10.0]
-        
-        let regression = ChartMath.linearRegression(x, y)
-        
-        XCTAssertEqual(regression.slope, 2.0, accuracy: 0.001)
-        XCTAssertEqual(regression.intercept, 0.0, accuracy: 0.001)
-        XCTAssertEqual(regression.rSquared, 1.0, accuracy: 0.001)
-    }
+    // MARK: - Radar Chart Tests
     
-    func testNormalization() {
-        let values = [10.0, 20.0, 30.0, 40.0, 50.0]
-        let normalized = ChartMath.normalize(values)
+    func testRadarDataSeriesCreation() {
+        let series = RadarDataSeries(
+            name: "Skills",
+            values: [80, 90, 70, 60, 85],
+            color: .red
+        )
         
-        XCTAssertEqual(normalized[0], 0.0, accuracy: 0.001)
-        XCTAssertEqual(normalized[2], 0.5, accuracy: 0.001)
-        XCTAssertEqual(normalized[4], 1.0, accuracy: 0.001)
-    }
-    
-    func testNiceTickValues() {
-        let ticks = ChartMath.niceTickValues(min: 0, max: 100, count: 6)
-        
-        XCTAssertGreaterThan(ticks.count, 0)
-        XCTAssertLessThanOrEqual(ticks.first ?? 0, 0)
-        XCTAssertGreaterThanOrEqual(ticks.last ?? 0, 100)
-    }
-    
-    func testSimpleMovingAverage() {
-        let values = [10.0, 20.0, 30.0, 40.0, 50.0]
-        let sma = ChartMath.simpleMovingAverage(values, window: 3)
-        
-        XCTAssertEqual(sma.count, 3)
-        XCTAssertEqual(sma[0], 20.0, accuracy: 0.001)
-        XCTAssertEqual(sma[1], 30.0, accuracy: 0.001)
-        XCTAssertEqual(sma[2], 40.0, accuracy: 0.001)
-    }
-    
-    func testDegreesToRadians() {
-        XCTAssertEqual(ChartMath.degreesToRadians(0), 0, accuracy: 0.001)
-        XCTAssertEqual(ChartMath.degreesToRadians(90), .pi / 2, accuracy: 0.001)
-        XCTAssertEqual(ChartMath.degreesToRadians(180), .pi, accuracy: 0.001)
-        XCTAssertEqual(ChartMath.degreesToRadians(360), 2 * .pi, accuracy: 0.001)
-    }
-    
-    // MARK: - Data Model Tests
-    
-    func testLabeledDataPoint() {
-        let point = LabeledDataPoint(label: "Test", value: 42.0, color: .blue)
-        
-        XCTAssertEqual(point.label, "Test")
-        XCTAssertEqual(point.value, 42.0)
-        XCTAssertNotNil(point.color)
-    }
-    
-    func testXYDataPoint() {
-        let point = XYDataPoint(x: 10, y: 20, label: "Point", size: 30, color: .red)
-        
-        XCTAssertEqual(point.x, 10)
-        XCTAssertEqual(point.y, 20)
-        XCTAssertEqual(point.label, "Point")
-        XCTAssertEqual(point.size, 30)
-    }
-    
-    func testHierarchyNode() {
-        let leaf1 = HierarchyNode(name: "Leaf1", value: 100)
-        let leaf2 = HierarchyNode(name: "Leaf2", value: 200)
-        let root = HierarchyNode(name: "Root", children: [leaf1, leaf2])
-        
-        XCTAssertEqual(root.name, "Root")
-        XCTAssertEqual(root.children.count, 2)
-        XCTAssertEqual(root.totalValue, 300)
-        XCTAssertFalse(root.isLeaf)
-        XCTAssertTrue(leaf1.isLeaf)
-    }
-    
-    func testFlowConnection() {
-        let connection = FlowConnection(source: "A", target: "B", value: 100)
-        
-        XCTAssertEqual(connection.source, "A")
-        XCTAssertEqual(connection.target, "B")
-        XCTAssertEqual(connection.value, 100)
-    }
-    
-    func testGanttTask() {
-        let startDate = Date()
-        let endDate = startDate.addingTimeInterval(86400 * 5)
-        let task = GanttTask(name: "Task 1", startDate: startDate, endDate: endDate, progress: 0.5)
-        
-        XCTAssertEqual(task.name, "Task 1")
-        XCTAssertEqual(task.progress, 0.5)
-        XCTAssertEqual(task.durationInDays, 5)
-    }
-    
-    func testRangeDataPoint() {
-        let point = RangeDataPoint(label: "Range", low: 10, high: 50, open: 20, close: 40)
-        
-        XCTAssertEqual(point.range, 40)
-        XCTAssertEqual(point.midpoint, 30)
+        XCTAssertEqual(series.name, "Skills")
+        XCTAssertEqual(series.values.count, 5)
     }
     
     // MARK: - Theme Tests
     
-    func testChartThemeDefaults() {
+    func testDefaultTheme() {
         let theme = ChartTheme.default
         
-        XCTAssertEqual(theme.palette.count, 8)
-        XCTAssertEqual(theme.animationDuration, 0.5)
+        XCTAssertEqual(theme.name, "Default")
+        XCTAssertFalse(theme.colorPalette.isEmpty)
     }
     
-    func testChartThemeColorAccess() {
-        let theme = ChartTheme.default
+    func testDarkTheme() {
+        let theme = ChartTheme.dark
         
-        // Should wrap around
-        XCTAssertNotNil(theme.color(at: 0))
-        XCTAssertNotNil(theme.color(at: 10))
+        XCTAssertEqual(theme.name, "Dark")
     }
     
-    func testChartThemeBuilder() {
-        let theme = ChartThemeBuilder()
-            .animationDuration(1.0)
-            .cornerRadius(12)
-            .build()
+    func testMidnightTheme() {
+        let theme = ChartTheme.midnight
         
-        XCTAssertEqual(theme.animationDuration, 1.0)
-        XCTAssertEqual(theme.cornerRadius, 12)
+        XCTAssertEqual(theme.name, "Midnight")
     }
     
     // MARK: - Configuration Tests
     
-    func testChartConfiguration() {
+    func testChartConfigurationDefaults() {
+        let config = ChartConfiguration()
+        
+        XCTAssertTrue(config.animated)
+        XCTAssertEqual(config.animationDuration, 0.3)
+        XCTAssertTrue(config.showGrid)
+        XCTAssertTrue(config.tooltipsEnabled)
+        XCTAssertTrue(config.showLegend)
+    }
+    
+    func testChartConfigurationCustom() {
         let config = ChartConfiguration(
             animated: false,
-            showGrid: true,
-            tooltipsEnabled: false
+            animationDuration: 0.5,
+            showGrid: false,
+            tooltipsEnabled: false,
+            showLegend: false
         )
         
         XCTAssertFalse(config.animated)
-        XCTAssertTrue(config.showGrid)
+        XCTAssertEqual(config.animationDuration, 0.5)
+        XCTAssertFalse(config.showGrid)
         XCTAssertFalse(config.tooltipsEnabled)
+        XCTAssertFalse(config.showLegend)
     }
     
-    func testAxisConfiguration() {
-        let config = AxisConfiguration(
-            showAxisLine: true,
-            tickCount: 10,
-            title: "X Axis"
+    // MARK: - Data Point Tests
+    
+    func testChartDataPointCreation() {
+        let point = ChartDataPoint(
+            label: "January",
+            value: 100,
+            color: .blue,
+            position: CGPoint(x: 50, y: 100)
         )
         
-        XCTAssertTrue(config.showAxisLine)
-        XCTAssertEqual(config.tickCount, 10)
-        XCTAssertEqual(config.title, "X Axis")
+        XCTAssertEqual(point.label, "January")
+        XCTAssertEqual(point.value, 100)
+        XCTAssertEqual(point.position.x, 50)
     }
     
-    func testGridConfiguration() {
-        let config = GridConfiguration.dashed
-        
-        XCTAssertTrue(config.showHorizontalLines)
-        XCTAssertFalse(config.dashPattern.isEmpty)
-    }
-    
-    // MARK: - Sample Data Tests
-    
-    func testSampleDataLabeledPoints() {
-        let points = SampleData.labeledPoints(count: 10)
-        
-        XCTAssertEqual(points.count, 10)
-        XCTAssertTrue(points.allSatisfy { !$0.label.isEmpty })
-    }
-    
-    func testSampleDataHierarchy() {
-        let root = SampleData.hierarchy(depth: 2, breadth: 3)
-        
-        XCTAssertEqual(root.name, "Root")
-        XCTAssertEqual(root.children.count, 3)
-    }
-    
-    func testSampleDataCandlesticks() {
-        let candles = SampleData.candlesticks(count: 10)
-        
-        XCTAssertEqual(candles.count, 10)
-        XCTAssertTrue(candles.allSatisfy { $0.high >= $0.low })
-        XCTAssertTrue(candles.allSatisfy { $0.high >= max($0.open, $0.close) })
-        XCTAssertTrue(candles.allSatisfy { $0.low <= min($0.open, $0.close) })
-    }
-    
-    // MARK: - BoxPlotStatistics Tests
-    
-    func testBoxPlotStatistics() {
-        let values = Array(stride(from: 1.0, through: 100.0, by: 1.0))
-        let stats = BoxPlotStatistics(values: values)
-        
-        XCTAssertEqual(stats.min, 1.0, accuracy: 1)
-        XCTAssertEqual(stats.max, 100.0, accuracy: 1)
-        XCTAssertEqual(stats.median, 50.5, accuracy: 1)
-        XCTAssertEqual(stats.mean, 50.5, accuracy: 0.1)
-    }
-    
-    // MARK: - Accessibility Label Tests
-    
-    func testAccessibilityLabelForDataPoint() {
-        let label = ChartAccessibilityLabel.forDataPoint(
-            label: "Revenue",
-            value: 1500,
-            format: "%.0f",
-            unit: " USD"
+    func testAccessibleDataPointCreation() {
+        let point = AccessibleDataPoint(
+            label: "Q1 Revenue",
+            value: 50000,
+            customDescription: "First quarter revenue of fifty thousand dollars"
         )
         
-        XCTAssertTrue(label.contains("Revenue"))
-        XCTAssertTrue(label.contains("1500"))
-        XCTAssertTrue(label.contains("USD"))
+        XCTAssertEqual(point.label, "Q1 Revenue")
+        XCTAssertEqual(point.value, 50000)
+        XCTAssertNotNil(point.customDescription)
     }
     
-    func testAccessibilityLabelForTrend() {
-        let label = ChartAccessibilityLabel.forTrend(
-            label: "Sales",
-            currentValue: 110,
-            previousValue: 100
+    // MARK: - High Performance Renderer Tests
+    
+    @MainActor
+    func testHighPerformanceRendererCreation() async {
+        let data = (0..<1000).map { Double($0) }
+        let renderer = HighPerformanceRenderer(data: data)
+        
+        XCTAssertEqual(renderer.originalCount, 1000)
+    }
+    
+    @MainActor
+    func testHighPerformanceRendererSampling() async {
+        let data = (0..<10000).map { Double($0) }
+        let renderer = HighPerformanceRenderer(
+            data: data,
+            samplingStrategy: .uniform
         )
         
-        XCTAssertTrue(label.contains("Sales"))
-        XCTAssertTrue(label.contains("increased"))
-        XCTAssertTrue(label.contains("10"))
+        let sampled = renderer.optimizedData(targetPoints: 100)
+        
+        XCTAssertEqual(sampled.count, 100)
     }
     
-    // MARK: - Chart Description Tests
+    @MainActor
+    func testHighPerformanceRendererLTTB() async {
+        let data = (0..<5000).map { Double($0) }
+        let renderer = HighPerformanceRenderer(
+            data: data,
+            samplingStrategy: .largestTriangle(buckets: 500)
+        )
+        
+        let sampled = renderer.optimizedData(targetPoints: 500)
+        
+        XCTAssertLessThanOrEqual(sampled.count, 502) // Allow for first/last points
+    }
     
-    func testLineChartDescription() {
+    // MARK: - Real-Time Stream Tests
+    
+    @MainActor
+    func testRealTimeStreamCreation() async {
+        let stream = RealTimeDataStream<Double>(
+            windowSize: 100,
+            updateFrequency: .fps30
+        )
+        
+        XCTAssertEqual(stream.windowSize, 100)
+        XCTAssertTrue(stream.data.isEmpty)
+    }
+    
+    @MainActor
+    func testRealTimeStreamPush() async {
+        let stream = RealTimeDataStream<Double>(windowSize: 10)
+        
+        stream.push(value: 42.0)
+        stream.start()
+        
+        // Wait for flush
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        
+        XCTAssertFalse(stream.data.isEmpty)
+    }
+    
+    // MARK: - Animation Preset Tests
+    
+    func testAnimationPresets() {
+        XCTAssertNil(ChartAnimationPreset.none.animation)
+        XCTAssertNotNil(ChartAnimationPreset.quick.animation)
+        XCTAssertNotNil(ChartAnimationPreset.smooth.animation)
+        XCTAssertNotNil(ChartAnimationPreset.spring.animation)
+        XCTAssertNotNil(ChartAnimationPreset.elastic.animation)
+    }
+    
+    func testAnimationDurations() {
+        XCTAssertEqual(ChartAnimationPreset.none.duration, 0)
+        XCTAssertEqual(ChartAnimationPreset.quick.duration, 0.2)
+        XCTAssertEqual(ChartAnimationPreset.smooth.duration, 0.5)
+    }
+    
+    // MARK: - Export Tests
+    
+    @MainActor
+    func testExportOptionsDefaults() async {
+        let options = ChartExporter.ExportOptions()
+        
+        XCTAssertEqual(options.scale, 2.0)
+        XCTAssertEqual(options.jpegQuality, 0.9)
+        XCTAssertTrue(options.includeTitle)
+        XCTAssertTrue(options.includeLegend)
+    }
+    
+    // MARK: - Sampling Strategy Tests
+    
+    func testSamplingStrategies() {
+        let strategies: [SamplingStrategy] = [
+            .none,
+            .uniform,
+            .largestTriangle(buckets: 100),
+            .minMax,
+            .adaptive(threshold: 0.5)
+        ]
+        
+        XCTAssertEqual(strategies.count, 5)
+    }
+    
+    // MARK: - Benchmark Tests
+    
+    func testBenchmarkDataGeneration() {
+        let data = ChartBenchmark.generateTestData(count: 1000)
+        
+        XCTAssertEqual(data.count, 1000)
+        XCTAssertTrue(data.allSatisfy { $0.y >= 0 && $0.y <= 120 })
+    }
+    
+    // MARK: - Accessibility Tests
+    
+    func testAccessibilityConfiguration() {
+        let config = ChartAccessibilityConfiguration(
+            label: "Sales Chart",
+            summary: "Monthly sales from January to December",
+            enableAudioGraph: true,
+            announceChanges: true
+        )
+        
+        XCTAssertEqual(config.label, "Sales Chart")
+        XCTAssertNotNil(config.summary)
+        XCTAssertTrue(config.enableAudioGraph)
+    }
+    
+    func testChartDescriptionGenerator() {
         let description = ChartDescriptionGenerator.describeLineChart(
-            title: "Sales",
-            dataPoints: [10, 20, 30, 40, 50]
-        )
-        
-        XCTAssertTrue(description.contains("Sales"))
-        XCTAssertTrue(description.contains("5 data points"))
-        XCTAssertTrue(description.contains("upward"))
-    }
-    
-    func testBarChartDescription() {
-        let description = ChartDescriptionGenerator.describeBarChart(
             title: "Revenue",
-            bars: [("Q1", 100), ("Q2", 150), ("Q3", 80)]
+            seriesNames: ["2024"],
+            values: [[100, 150, 200, 180, 220]],
+            labels: ["Jan", "Feb", "Mar", "Apr", "May"]
         )
         
         XCTAssertTrue(description.contains("Revenue"))
-        XCTAssertTrue(description.contains("3 bars"))
-        XCTAssertTrue(description.contains("Q2"))
+        XCTAssertTrue(description.contains("2024"))
+    }
+    
+    // MARK: - Build Info Tests
+    
+    func testBuildInfo() {
+        XCTAssertEqual(BuildInfo.version, "2.0.0")
+        XCTAssertFalse(BuildInfo.platforms.isEmpty)
+        XCTAssertTrue(BuildInfo.platforms.contains("iOS 15+"))
+    }
+    
+    func testChartFeatures() {
+        XCTAssertTrue(ChartFeatures.realTimeStreaming)
+        XCTAssertTrue(ChartFeatures.highPerformanceRendering)
+        XCTAssertTrue(ChartFeatures.exportSupport)
+        XCTAssertTrue(ChartFeatures.accessibility)
+        XCTAssertEqual(ChartFeatures.maxOptimalDataPoints, 1_000_000)
+    }
+}
+
+// MARK: - Performance Tests
+
+final class PerformanceTests: XCTestCase {
+    
+    @MainActor
+    func testLargeDatasetPerformance() async {
+        let data = (0..<100_000).map { Double($0) }
+        
+        measure {
+            let renderer = HighPerformanceRenderer(
+                data: data,
+                samplingStrategy: .largestTriangle(buckets: 1000)
+            )
+            _ = renderer.optimizedData(targetPoints: 1000)
+        }
+    }
+    
+    func testDataPointCreationPerformance() {
+        measure {
+            for i in 0..<10000 {
+                _ = ChartDataPoint(
+                    label: "Point \(i)",
+                    value: Double(i),
+                    position: CGPoint(x: CGFloat(i), y: CGFloat(i))
+                )
+            }
+        }
     }
 }
