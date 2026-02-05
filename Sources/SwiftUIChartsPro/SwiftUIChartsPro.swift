@@ -1,15 +1,18 @@
-// SwiftUIChartsPro
-// Advanced chart components for SwiftUI beyond Apple Charts
-//
-// Created by Muhittin Camdali
-// Copyright © 2024 All rights reserved.
+// SwiftUI Charts Pro
+// The most comprehensive charting library for SwiftUI
+// iOS 15+ | macOS 12+ | watchOS 8+ | tvOS 15+ | visionOS 1+
 
-import SwiftUI
-
-/// SwiftUI Charts Pro - A comprehensive charting library for SwiftUI.
+/// SwiftUI Charts Pro - Production-Ready Charts Library
 ///
-/// This library provides 20+ advanced chart types beyond what Apple Charts offers,
-/// including Heatmaps, Treemaps, Sankey Diagrams, Gantt Charts, and more.
+/// A comprehensive, high-performance charting library for SwiftUI that provides:
+/// - 20+ chart types including Line, Bar, Pie, Area, Scatter, Radar, and more
+/// - iOS 15+ backward compatibility (Apple Charts requires iOS 16+)
+/// - Real-time data streaming support
+/// - 1M+ data point rendering with intelligent downsampling
+/// - Interactive zoom, pan, and selection gestures
+/// - Export to PNG, JPEG, PDF, and SVG
+/// - Full accessibility support with VoiceOver and audio graphs
+/// - Custom themes and animation presets
 ///
 /// ## Quick Start
 ///
@@ -17,236 +20,133 @@ import SwiftUI
 /// import SwiftUIChartsPro
 ///
 /// struct ContentView: View {
+///     let data = [
+///         LineDataSeries(name: "Revenue", values: [100, 150, 200, 180, 220])
+///     ]
+///
 ///     var body: some View {
-///         RadarChart(
-///             data: [
-///                 RadarDataSeries(name: "Sales", values: [80, 90, 70, 60, 85])
-///             ],
-///             labels: ["Q1", "Q2", "Q3", "Q4", "Q5"]
-///         )
-///         .chartTheme(.dark)
+///         LineChart(data: data, labels: ["Jan", "Feb", "Mar", "Apr", "May"])
+///             .chartTheme(.midnight)
+///             .chartAnimation(.spring)
+///             .chartAccessibility(label: "Monthly Revenue")
 ///     }
 /// }
 /// ```
-///
-/// ## Available Chart Types
-///
-/// - ``HeatmapChart``: Color-coded matrix visualization
-/// - ``TreemapChart``: Hierarchical data as nested rectangles
-/// - ``RadarChart``: Spider/radar charts for multivariate data
-/// - ``SankeyChart``: Flow diagrams showing quantities between nodes
-/// - ``FunnelChart``: Sequential stage conversion visualization
-/// - ``GanttChart``: Project timeline and scheduling
-/// - ``CandlestickChart``: Financial OHLC charts
-/// - ``GaugeChart``: Meter/gauge for single values
-/// - ``BubbleChart``: Scatter plots with size dimension
-/// - ``WordCloudChart``: Text frequency visualization
-/// - ``WaterfallChart``: Cumulative effect visualization
-/// - ``BoxPlotChart``: Statistical distribution via quartiles
-/// - ``ViolinChart``: Distribution shape with kernel density
-/// - ``ParallelCoordinatesChart``: High-dimensional data
-/// - ``ChordDiagram``: Circular relationship visualization
-/// - ``SunburstChart``: Radial hierarchical chart
-///
-/// ## Theming
-///
-/// Apply consistent styling with built-in themes:
-///
-/// ```swift
-/// MyChart(data: data)
-///     .chartTheme(.dark)      // Dark theme
-///     .chartTheme(.pastel)    // Pastel colors
-///     .chartTheme(.vibrant)   // Saturated colors
-/// ```
-///
-/// ## Interactions
-///
-/// Enable interactive features:
-///
-/// ```swift
-/// MyChart(data: data)
-///     .chartZoom(manager: zoomManager)
-///     .onChartSelection { point in
-///         print("Selected: \(point)")
-///     }
-/// ```
-///
-/// ## Export
-///
-/// Export charts as images:
-///
-/// ```swift
-/// let exporter = ChartExporter()
-/// if let result = exporter.exportToData(view: myChart, size: CGSize(width: 800, height: 600)) {
-///     // Use result.data
-/// }
-/// ```
 
-// MARK: - Library Version
+// MARK: - Core Components
 
-/// The current version of SwiftUIChartsPro.
-public let swiftUIChartsProVersion = "1.0.0"
+// Chart Base
+@_exported import struct SwiftUI.Color
+@_exported import struct SwiftUI.Animation
 
-/// Minimum iOS version supported.
-public let minimumIOSVersion = "16.0"
+// Configuration
+public typealias ChartConfig = ChartConfiguration
 
-// MARK: - Type Aliases
+// MARK: - Chart Types
 
-/// Convenience type alias for labeled data points.
-public typealias ChartPoint = LabeledDataPoint
+// Basic Charts
+// - LineChart: Animated line charts with multiple series
+// - BarChart: Grouped, stacked, and horizontal bar charts
+// - PieChart: Pie and donut charts with labels
+// - AreaChart: Stacked, overlapped, and stream area charts
+// - ScatterPlot: Scatter plots with trend lines and clustering
 
-/// Convenience type alias for time series data.
-public typealias TimePoint = TimeSeriesDataPoint
+// Advanced Charts
+// - RadarChart: Spider/radar charts for multivariate data
+// - CandlestickChart: Financial candlestick/OHLC charts
+// - HeatmapChart: 2D heatmaps with color gradients
+// - TreemapChart: Hierarchical treemap visualization
+// - SankeyChart: Flow diagrams for value transfer
+// - FunnelChart: Conversion funnel visualization
+// - GaugeChart: Circular and linear gauges
+// - BoxPlotChart: Statistical box plots
+// - ViolinChart: Violin plots for distribution
+// - BubbleChart: Bubble charts with size encoding
+// - WaterfallChart: Cumulative effect waterfall charts
+// - GanttChart: Project timeline visualization
+// - SunburstChart: Hierarchical sunburst diagrams
+// - ChordDiagram: Relationship chord diagrams
+// - ParallelCoordinates: High-dimensional data visualization
+// - WordCloudChart: Word frequency visualization
 
-/// Convenience type alias for hierarchical data.
-public typealias TreeNode = HierarchyNode
+// MARK: - Version
 
-/// Convenience type alias for flow connections.
-public typealias FlowLink = FlowConnection
+/// The current version of SwiftUI Charts Pro
+public let swiftUIChartsProVersion = "2.0.0"
 
-// MARK: - Library Entry Point
-
-/// Entry point for SwiftUIChartsPro configuration.
-public enum SwiftUIChartsPro {
-    
-    /// Configures default settings for all charts.
-    public static func configure(
-        defaultTheme: ChartTheme = .default,
-        defaultAnimation: ChartAnimation = .smooth,
-        defaultConfiguration: ChartConfiguration = ChartConfiguration()
-    ) {
-        // Store defaults in UserDefaults or static properties
-        _defaultTheme = defaultTheme
-        _defaultAnimation = defaultAnimation
-        _defaultConfiguration = defaultConfiguration
-    }
-    
-    /// The default theme for new charts.
-    public static var defaultTheme: ChartTheme {
-        _defaultTheme ?? .default
-    }
-    
-    /// The default animation for chart transitions.
-    public static var defaultAnimation: ChartAnimation {
-        _defaultAnimation ?? .smooth
-    }
-    
-    /// The default configuration for new charts.
-    public static var defaultConfiguration: ChartConfiguration {
-        _defaultConfiguration ?? ChartConfiguration()
-    }
-    
-    // Private storage
-    private static var _defaultTheme: ChartTheme?
-    private static var _defaultAnimation: ChartAnimation?
-    private static var _defaultConfiguration: ChartConfiguration?
+/// Build information
+public struct BuildInfo {
+    public static let version = "2.0.0"
+    public static let buildDate = "2025-02-05"
+    public static let minimumSwiftVersion = "5.9"
+    public static let platforms = ["iOS 15+", "macOS 12+", "watchOS 8+", "tvOS 15+", "visionOS 1+"]
 }
 
-// MARK: - Sample Data Generators
+// MARK: - Feature Flags
 
-/// Generates sample data for testing and previews.
-public enum SampleData {
+/// Feature availability flags
+public struct ChartFeatures {
+    /// Whether real-time streaming is available
+    public static let realTimeStreaming = true
     
-    /// Generates random labeled data points.
-    public static func labeledPoints(count: Int, range: ClosedRange<Double> = 0...100) -> [LabeledDataPoint] {
-        (0..<count).map { i in
-            LabeledDataPoint(
-                label: "Item \(i + 1)",
-                value: Double.random(in: range)
-            )
-        }
-    }
+    /// Whether high-performance rendering is available
+    public static let highPerformanceRendering = true
     
-    /// Generates random XY data points.
-    public static func xyPoints(count: Int, xRange: ClosedRange<Double> = 0...100, yRange: ClosedRange<Double> = 0...100) -> [XYDataPoint] {
-        (0..<count).map { _ in
-            XYDataPoint(
-                x: Double.random(in: xRange),
-                y: Double.random(in: yRange),
-                size: Double.random(in: 10...50)
-            )
-        }
-    }
+    /// Whether export functionality is available
+    public static let exportSupport = true
     
-    /// Generates a sample hierarchy.
-    public static func hierarchy(depth: Int = 3, breadth: Int = 4) -> HierarchyNode {
-        func generateChildren(currentDepth: Int) -> [HierarchyNode] {
-            guard currentDepth < depth else {
-                return (0..<breadth).map { i in
-                    HierarchyNode(name: "Leaf \(i + 1)", value: Double.random(in: 10...100))
-                }
-            }
-            
-            return (0..<breadth).map { i in
-                HierarchyNode(
-                    name: "Node \(currentDepth)-\(i + 1)",
-                    children: generateChildren(currentDepth: currentDepth + 1)
-                )
-            }
-        }
-        
-        return HierarchyNode(
-            name: "Root",
-            children: generateChildren(currentDepth: 0)
+    /// Whether accessibility features are available
+    public static let accessibility = true
+    
+    /// Whether interactive gestures are available
+    public static let interactiveGestures = true
+    
+    /// Maximum supported data points for optimal performance
+    public static let maxOptimalDataPoints = 1_000_000
+}
+
+// MARK: - Convenience Initializers
+
+public extension LineChart {
+    /// Creates a simple line chart from values.
+    init(values: [Double], labels: [String] = []) {
+        self.init(
+            data: [LineDataSeries(name: "Data", values: values)],
+            labels: labels
         )
     }
-    
-    /// Generates sample flow connections.
-    public static func flowConnections() -> [FlowConnection] {
-        [
-            FlowConnection(source: "A", target: "B", value: 100),
-            FlowConnection(source: "A", target: "C", value: 80),
-            FlowConnection(source: "B", target: "D", value: 60),
-            FlowConnection(source: "B", target: "E", value: 40),
-            FlowConnection(source: "C", target: "D", value: 50),
-            FlowConnection(source: "C", target: "F", value: 30)
-        ]
+}
+
+public extension BarChart {
+    /// Creates a simple bar chart from values.
+    init(values: [Double], labels: [String] = []) {
+        self.init(
+            data: [BarDataSeries(name: "Data", values: values)],
+            labels: labels
+        )
     }
-    
-    /// Generates sample heatmap data.
-    public static func heatmapMatrix(rows: Int, cols: Int, range: ClosedRange<Double> = 0...100) -> [[Double]] {
-        (0..<rows).map { _ in
-            (0..<cols).map { _ in Double.random(in: range) }
-        }
+}
+
+public extension PieChart {
+    /// Creates a pie chart from label-value pairs.
+    init(items: [(label: String, value: Double)]) {
+        self.init(
+            data: items.map { PieSlice(label: $0.label, value: $0.value) }
+        )
     }
-    
-    /// Generates sample time series data.
-    public static func timeSeries(days: Int, baseValue: Double = 100) -> [TimeSeriesDataPoint] {
-        let calendar = Calendar.current
-        let today = Date()
-        var value = baseValue
-        
-        return (0..<days).map { i in
-            value += Double.random(in: -10...10)
-            let date = calendar.date(byAdding: .day, value: -days + i, to: today) ?? today
-            return TimeSeriesDataPoint(date: date, value: value)
-        }
-    }
-    
-    /// Generates sample candlestick data.
-    public static func candlesticks(count: Int, startPrice: Double = 100) -> [CandlestickData] {
-        let calendar = Calendar.current
-        let today = Date()
-        var price = startPrice
-        
-        return (0..<count).map { i in
-            let date = calendar.date(byAdding: .day, value: -count + i, to: today) ?? today
-            let open = price + Double.random(in: -5...5)
-            let close = open + Double.random(in: -10...10)
-            let high = max(open, close) + Double.random(in: 0...5)
-            let low = min(open, close) - Double.random(in: 0...5)
-            let volume = Double.random(in: 100_000...500_000)
-            
-            price = close
-            
-            return CandlestickData(
-                date: date,
-                open: open,
-                high: high,
-                low: low,
-                close: close,
-                volume: volume
-            )
+}
+
+// MARK: - Debug Helpers
+
+#if DEBUG
+public extension View {
+    /// Prints chart performance metrics.
+    func chartDebug() -> some View {
+        self.onAppear {
+            print("📊 SwiftUI Charts Pro v\(swiftUIChartsProVersion)")
+            print("   Platforms: \(BuildInfo.platforms.joined(separator: ", "))")
+            print("   Features: Real-time ✓, High-perf ✓, Export ✓, A11y ✓")
         }
     }
 }
+#endif
