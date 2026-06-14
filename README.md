@@ -15,6 +15,9 @@
 
 # SwiftUI Charts Pro
 
+## 🚀 Killer Feature: Real-Time Data Ticker API
+Perfect for Crypto and Finance. Feed a WebSocket `AsyncStream` directly into our `Canvas`-based Ticker API to render thousands of data points moving at a flawless 60fps.
+
 <p align="center">
   <img src="https://img.shields.io/badge/iOS-15.0+-blue?style=for-the-badge&logo=apple" alt="iOS 15+">
   <img src="https://img.shields.io/badge/macOS-12.0+-blue?style=for-the-badge&logo=apple" alt="macOS 12+">
